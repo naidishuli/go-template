@@ -8,5 +8,8 @@ import (
 
 // RegisterRoutes used to register api routes to their handlers
 func RegisterRoutes(app internal.AppContext, fiberApp *fiber.App) {
+	//ctx := controller.NewContext(app)
+	//
+	//securedAPI := fiberApp.Group("/api", )
 
 }

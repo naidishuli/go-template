@@ -1,11 +1,9 @@
 package internal
 
-import (
-	"go-template/internal/app/pool"
-)
+import "go-template/internal/pool"
 
 type AppContext interface {
 	Pkg() *pool.Pkg
 	Repository() *pool.Repository
-	Service() *pool.Service
+	Service() *Service
 }

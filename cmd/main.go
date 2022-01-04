@@ -7,12 +7,12 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 
 	"go-template/api"
-	"go-template/internal/app"
+	"go-template/internal"
 	"go-template/internal/config"
 )
 
 func main() {
-	application, err := app.New()
+	application, err := internal.New()
 	if err != nil {
 		panic(err)
 	}

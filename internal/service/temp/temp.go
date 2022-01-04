@@ -8,18 +8,18 @@ type Repository interface {
 	DoSomethingTemp()
 }
 
-type Service struct {
+type Temp struct {
 	repo Repository
 }
 
 // NewTempService create a new service of type Temp
-func NewTempService(app service.DepsContext) *Service {
-	return &Service{
-		repo: app.Deps().Repository.(Repository),
+func NewTempService(app service.Context) *Temp {
+	return &Temp{
+		repo: app.Repository(),
 	}
 }
 
 // DoSomething used as an example to follow
-func (s *Service) DoSomething() {
+func (s *Temp) DoSomething() {
 	s.repo.DoSomethingTemp()
 }
