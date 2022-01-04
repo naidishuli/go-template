@@ -3,14 +3,31 @@ package main
 import (
 	"fmt"
 
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+
+	"go-template/api"
 	"go-template/internal/app"
+	"go-template/internal/config"
 )
 
 func main() {
-	appl, err := app.New()
+	application, err := app.New()
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(appl)
+	fiberApp := fiber.New(fiber.Config{
+		ErrorHandler: api.ErrorHandler,
+	})
+
+	fiberApp.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+	}))
+
+	api.RegisterRoutes(application, fiberApp)
+	err = fiberApp.Listen(fmt.Sprintf(":%d", config.Env.Port))
+	if err != nil {
+		panic(err)
+	}
 }

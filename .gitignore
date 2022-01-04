@@ -4,3 +4,7 @@
 
 # Env config
 .env
+
+# API DOC files
+docs/*
+!docs/.keep
