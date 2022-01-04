@@ -1,6 +1,6 @@
-package api
+package response
 
 // 200
-type swagStatusOk struct {
+type SwagStatusOk struct {
 	Status string `json:"status" example:"ok"`
 }
