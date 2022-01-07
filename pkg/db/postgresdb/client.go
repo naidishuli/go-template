@@ -1,4 +1,4 @@
-package postgres
+package postgresdb
 
 import (
 	"fmt"
@@ -49,7 +49,7 @@ func (c *Config) parse() {
 	}
 }
 
-func NewPostgresConn(config Config) (*gorm.DB, error) {
+func New(config Config) (*gorm.DB, error) {
 	config.parse()
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
