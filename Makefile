@@ -8,3 +8,7 @@ doc: prepare-doc
 # quickly open the doc.html file in the browser
 show-doc:
 	open docs/doc.html
+
+# run lint
+lint:
+	golangci-lint run --timeout 5m

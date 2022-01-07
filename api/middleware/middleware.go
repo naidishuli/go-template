@@ -43,7 +43,7 @@ func (a *Middleware) Authorize(ctx *fiber.Ctx) error {
 		return ctx.Status(401).SendString(err.Error())
 	}
 
-	userCtx := context.WithValue(context.Background(), "user", user)
+	userCtx := context.WithValue(context.Background(), UserContext, user)
 	ctx.SetUserContext(userCtx)
 	return ctx.Next()
 }
