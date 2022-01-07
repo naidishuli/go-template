@@ -5,7 +5,7 @@ import (
 	"go-template/pkg/jwt"
 )
 
-// Pkg used as an initializer of the outside pool module
+// Pkg used as an initializer of the outside pool module.
 type Pkg struct {
 	*jwt.JWT
 }

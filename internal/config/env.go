@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	"go-template/utils"
-
 	"github.com/joho/godotenv"
+
+	"go-template/utils"
 )
 
 func newEnv() EnvVariables {
@@ -61,7 +61,7 @@ func (e *EnvVariables) load() (err error) {
 		err = e.loadEnvFile(".env")
 	}
 
-	//err = e.loadEnvFile(".env")
+	// err = e.loadEnvFile(".env")
 	e.loadValues(e)
 
 	return

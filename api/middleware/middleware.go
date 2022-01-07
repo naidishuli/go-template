@@ -33,7 +33,7 @@ func New(app internal.AppContext) *Middleware {
 	}
 }
 
-// Authorize validates the jwt token passed and inject the user data to the request context
+// Authorize validates the jwt token passed and inject the user data to the request context.
 func (a *Middleware) Authorize(ctx *fiber.Ctx) error {
 	var user model.User
 	authHeader := ctx.Get("authorization")

@@ -22,7 +22,7 @@ func New(secret string) *JWT {
 	return &JWT{secret}
 }
 
-// VerifyDataToken validate the authentication header and fills the data variable with the information found
+// VerifyDataToken validate the authentication header and fills the data variable with the information found.
 func (j *JWT) VerifyDataToken(header string, data interface{}) error {
 	bearerToken := strings.Split(header, " ")
 	if len(bearerToken) != 2 {
@@ -47,7 +47,7 @@ func (j *JWT) VerifyDataToken(header string, data interface{}) error {
 	return json.Unmarshal([]byte(token.Claims.(jwt.MapClaims)["user"].(string)), data)
 }
 
-// GenerateUserToken generate a jwt token string using an HS256 signing method from the given secret
+// GenerateUserToken generate a jwt token string using an HS256 signing method from the given secret.
 func (j *JWT) GenerateUserToken(userData string) (token Token, err error) {
 	expiresAt := time.Now().Add(time.Hour * 30 * 24).Unix()
 	claimMap := jwt.MapClaims{

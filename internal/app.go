@@ -54,7 +54,7 @@ func (a *Application) ServicePool() interface{} {
 
 // services
 
-// Service is a pool where all the services will be embedded
+// Service is a pool where all the services will be embedded.
 type Service struct {
 	*temp.Temp
 }

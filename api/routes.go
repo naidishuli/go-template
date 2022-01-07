@@ -9,7 +9,7 @@ import (
 	"go-template/internal"
 )
 
-// RegisterRoutes used to register api routes to their handlers
+// RegisterRoutes used to register api routes to their handlers.
 func RegisterRoutes(app internal.AppContext, fiberApp *fiber.App) {
 	ctxController := controller.NewContext(app)
 	generalMiddlewares := middleware.New(app)
@@ -24,7 +24,7 @@ func RegisterRoutes(app internal.AppContext, fiberApp *fiber.App) {
 	tempGroup := securedAPI.Group("/temp")
 	tempGroup.Get("/do_something", tempController.DoSomething)
 
-	//register all the unsecure routes here
+	// register all the unsecure routes here
 	fiberApp.Get("/ping", func(ctx *fiber.Ctx) error {
 		return ctx.Status(200).SendString("ok")
 	})
