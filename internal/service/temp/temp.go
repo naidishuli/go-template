@@ -4,8 +4,10 @@ import (
 	"go-template/internal/service"
 )
 
+//go:generate mockgen -source temp.go -package temp -destination temp_mock.go
+
 type Repository interface {
-	DoSomethingTemp()
+	DoSomethingTemp(string) error
 }
 
 type Temp struct {
@@ -20,6 +22,6 @@ func NewTempService(ctx service.Context) *Temp {
 }
 
 // DoSomething used as an example to follow
-func (s *Temp) DoSomething() {
-	s.repo.DoSomethingTemp()
+func (s *Temp) DoSomething(arg string) error {
+	return s.repo.DoSomethingTemp(arg)
 }
