@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
@@ -26,12 +25,12 @@ func New(secret string) *JWT {
 func (j *JWT) VerifyDataToken(header string, data interface{}) error {
 	bearerToken := strings.Split(header, " ")
 	if len(bearerToken) != 2 {
-		return fmt.Errorf("bearer token malformed or not present")
+		return malformedError()
 	}
 
 	token, err := jwt.Parse(bearerToken[1], func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("error verification jwtoken method")
+			return nil, verificationError()
 		}
 		return []byte(j.secret), nil
 	})
@@ -41,7 +40,7 @@ func (j *JWT) VerifyDataToken(header string, data interface{}) error {
 	}
 
 	if !token.Valid {
-		return fmt.Errorf("token valid")
+		return invalidError()
 	}
 
 	return json.Unmarshal([]byte(token.Claims.(jwt.MapClaims)["user"].(string)), data)
@@ -59,7 +58,7 @@ func (j *JWT) GenerateUserToken(userData string) (token Token, err error) {
 
 	tokenString, err := tokenValue.SignedString([]byte(j.secret))
 	if err != nil {
-		return token, fmt.Errorf("cannot sign token string: %s", err.Error())
+		return token, signError(err)
 	}
 
 	return Token{Token: tokenString, ExpiresAt: expiresAt}, nil
