@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	application, err := internal.New()
+	app, err := internal.NewApplication()
 	if err != nil {
 		panic(err)
 	}
@@ -25,7 +25,7 @@ func main() {
 		AllowOrigins: "*",
 	}))
 
-	api.RegisterRoutes(application, fiberApp)
+	api.RegisterRoutes(app, fiberApp)
 	err = fiberApp.Listen(fmt.Sprintf(":%d", config.Env.Port))
 	if err != nil {
 		panic(err)

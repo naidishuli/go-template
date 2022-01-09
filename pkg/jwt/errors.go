@@ -30,7 +30,7 @@ func malformedError() *tokenError {
 func verificationError() *tokenError {
 	return &tokenError{
 		reason:  VerificationErr,
-		message: "error verification jwtoken method",
+		message: "errors verification jwtoken method",
 	}
 }
 

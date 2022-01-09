@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 
 	"go-template/internal/pool"
-	"go-template/internal/service/temp"
+	"go-template/internal/services/temp"
 )
 
 type Application struct {
@@ -14,7 +14,7 @@ type Application struct {
 	servicePool    *Service
 }
 
-func New() (*Application, error) {
+func NewApplication() (*Application, error) {
 	app := Application{}
 
 	app.pkgPool = new(pool.Pkg)
@@ -34,6 +34,10 @@ func New() (*Application, error) {
 	*app.servicePool = servicePool
 
 	return &app, nil
+}
+
+func (a *Application) DB() *gorm.DB {
+	return a.db
 }
 
 func (a *Application) Pkg() *pool.Pkg {

@@ -3,14 +3,14 @@ package model
 import "encoding/json"
 
 type User struct {
-	Id        int `gorm:"column:id"`
+	ID        int `gorm:"column:id"`
 	Name      string
 	Timestamp `gorm:"embedded"`
 }
 
 func (u *User) JSONTokenData() string {
 	data := map[string]interface{}{
-		"id":   u.Id,
+		"id":   u.ID,
 		"name": u.Name,
 	}
 
