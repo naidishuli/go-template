@@ -11,10 +11,18 @@ func Unauthorized(details, devDetails interface{}) *ApiError {
 	}
 }
 
-func BadRequest(details interface{}) *ApiError {
-	return &ApiError{
+func BadRequest(err error, details interface{}) *ApiError {
+	apiError := &ApiError{
 		Status:  400,
-		Message: "Bad request",
+		Message: "BadRequest",
 		Details: details,
 	}
+
+	if err != nil {
+		apiError.Developer = &developer{
+			Details: err,
+		}
+	}
+
+	return apiError
 }

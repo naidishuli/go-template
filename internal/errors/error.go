@@ -6,11 +6,11 @@ import (
 )
 
 // Code represents the type of errors in the application level
-type Code int
+type Code string
 
 const (
-	GenerateToken    Code = 1
-	ResourceNotFound Code = 2
+	TokenGenerateError Code = "Error.Token.Generate"
+	NotFoundError      Code = "Error.NotFound"
 )
 
 // Error represent an errors happened in the application
