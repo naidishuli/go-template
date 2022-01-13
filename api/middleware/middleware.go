@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
+	"go-template/api/apierror"
 	"go-template/internal"
 	"go-template/internal/model"
 )
@@ -40,7 +41,7 @@ func (a *Middleware) Authorize(ctx *fiber.Ctx) error {
 
 	err := a.pkg.VerifyDataToken(authHeader, &user)
 	if err != nil {
-		return ctx.Status(401).SendString(err.Error())
+		return apierror.Unauthorized(nil, err)
 	}
 
 	userCtx := context.WithValue(context.Background(), UserContext, user)

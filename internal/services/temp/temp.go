@@ -14,8 +14,8 @@ type Temp struct {
 	repo Repository
 }
 
-// NewTempService create a new services of type Temp.
-func NewTempService(ctx services.Context) *Temp {
+// NewService create a new services of type Temp.
+func NewService(ctx services.Context) *Temp {
 	return &Temp{
 		repo: ctx.Repository(),
 	}

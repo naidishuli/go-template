@@ -9,8 +9,8 @@ import (
 type Code int
 
 const (
-	GenerateToken Code = 1
-	NotFound      Code = 2
+	GenerateToken    Code = 1
+	ResourceNotFound Code = 2
 )
 
 // Error represent an errors happened in the application

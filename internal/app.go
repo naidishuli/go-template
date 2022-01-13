@@ -65,6 +65,6 @@ type Service struct {
 
 func NewService(app *Application) Service {
 	return Service{
-		Temp: temp.NewTempService(app),
+		Temp: temp.NewService(app),
 	}
 }

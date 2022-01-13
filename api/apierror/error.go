@@ -65,7 +65,7 @@ func apiErrorFromInternalError(err *errors.Error) *ApiError {
 	case errors.GenerateToken:
 		apiError.Status = 500
 		apiError.Message = "Internal server error"
-	case errors.NotFound:
+	case errors.ResourceNotFound:
 		apiError.Status = 404
 		apiError.Message = "Resource not found"
 	default:

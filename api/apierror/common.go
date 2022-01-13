@@ -1,10 +1,13 @@
 package apierror
 
-func Unauthorized(details interface{}) *ApiError {
+func Unauthorized(details, devDetails interface{}) *ApiError {
 	return &ApiError{
 		Status:  401,
 		Message: "Unauthorized",
 		Details: details,
+		Developer: &developer{
+			Details: devDetails,
+		},
 	}
 }
 
