@@ -22,6 +22,20 @@ type Error struct {
 	Trace     string
 }
 
+func New(code Code, err error, details interface{}) error {
+	return &Error{
+		Code:    code,
+		Message: string(code),
+		Developer: &developer{
+			Details: map[string]interface{}{
+				"error":   err,
+				"details": details,
+			},
+		},
+		Trace: trace(),
+	}
+}
+
 // Error used to implement errors interface
 func (e Error) Error() string {
 	return e.Message
