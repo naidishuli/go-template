@@ -27,10 +27,6 @@ type Config struct {
 }
 
 func (c *Config) parse() {
-	if c.SSLMode == "" {
-		c.SSLMode = "disable"
-	}
-
 	if c.MaxOpenConnections == 0 {
 		c.MaxOpenConnections = 50
 	}
@@ -52,14 +48,17 @@ func (c *Config) parse() {
 func New(config Config) (*gorm.DB, error) {
 	config.parse()
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s",
 		config.Host,
 		config.Port,
 		config.Username,
 		config.Password,
 		config.Database,
-		config.SSLMode,
 	)
+
+	if config.SSLMode != "" {
+		psqlInfo += fmt.Sprintf(" sslmode=%s", config.SSLMode)
+	}
 
 	logMode := logger.Default.LogMode(logger.Info)
 	if os.Getenv("GOLANG_ENV") == "production" {
