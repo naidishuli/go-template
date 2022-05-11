@@ -1,17 +1,16 @@
-package pool
+package pkg
 
 import (
 	"go-template/internal/config"
 	"go-template/pkg/jwt"
 )
 
-// Pkg used as an initializer of the outside pool module.
-type Pkg struct {
+type Pool struct {
 	*jwt.JWT
 }
 
-func NewPkg() (Pkg, error) {
-	return Pkg{
+func NewPool() (Pool, error) {
+	return Pool{
 		JWT: jwt.New(config.Env.JwtVerificationKey),
 	}, nil
 }

@@ -26,7 +26,7 @@ type Middleware struct {
 	service Service
 }
 
-func New(app internal.AppContext) *Middleware {
+func New(app *internal.Application) *Middleware {
 	return &Middleware{
 		pkg:     app.Pkg(),
 		repo:    app.Repository(),

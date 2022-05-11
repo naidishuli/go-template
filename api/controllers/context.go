@@ -8,15 +8,15 @@ import (
 )
 
 type Context struct {
-	app internal.AppContext
+	*internal.Application
 }
 
-func NewContext(app internal.AppContext) *Context {
+func NewContext(app *internal.Application) *Context {
 	return &Context{app}
 }
 
-func (c *Context) App() internal.AppContext {
-	return c.app
+func (c *Context) App() *internal.Application {
+	return c.Application
 }
 
 func (c *Context) User(ctx *fiber.Ctx) model.User {

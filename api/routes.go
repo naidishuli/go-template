@@ -10,7 +10,7 @@ import (
 )
 
 // RegisterRoutes used to register api routes to their handlers.
-func RegisterRoutes(app internal.AppContext, fiberApp *fiber.App) {
+func RegisterRoutes(app *internal.Application, fiberApp *fiber.App) {
 	ctxController := controllers.NewContext(app)
 	generalMiddlewares := middleware.New(app)
 

@@ -3,34 +3,35 @@ package internal
 import (
 	"gorm.io/gorm"
 
-	"go-template/internal/pool"
-	"go-template/internal/services/temp"
+	"go-template/internal/pkg"
+	"go-template/internal/repository"
+	"go-template/internal/services"
 )
 
 type Application struct {
 	db             *gorm.DB
-	pkgPool        *pool.Pkg
-	repositoryPool *pool.Repository
-	servicePool    *Service
+	pkgPool        *pkg.Pool
+	repositoryPool *repository.Pool
+	servicePool    *services.Pool
 }
 
 func NewApplication() (*Application, error) {
 	app := Application{}
 
-	app.pkgPool = new(pool.Pkg)
-	app.repositoryPool = new(pool.Repository)
-	app.servicePool = new(Service)
+	app.pkgPool = new(pkg.Pool)
+	app.repositoryPool = new(repository.Pool)
+	app.servicePool = new(services.Pool)
 
-	pkgPool, err := pool.NewPkg()
+	pkgPool, err := pkg.NewPool()
 	if err != nil {
 		return nil, err
 	}
 	*app.pkgPool = pkgPool
 
-	repositoryPool := pool.NewRepository(app.db)
+	repositoryPool := repository.NewPool(app.db)
 	*app.repositoryPool = repositoryPool
 
-	servicePool := NewService(&app)
+	servicePool := services.NewPool(&app)
 	*app.servicePool = servicePool
 
 	return &app, nil
@@ -40,31 +41,18 @@ func (a *Application) DB() *gorm.DB {
 	return a.db
 }
 
-func (a *Application) Pkg() *pool.Pkg {
+func (a *Application) Pkg() *pkg.Pool {
 	return a.pkgPool
 }
 
-func (a *Application) Repository() *pool.Repository {
+func (a *Application) Repository() *repository.Pool {
 	return a.repositoryPool
 }
 
-func (a *Application) Service() *Service {
+func (a *Application) Service() *services.Pool {
 	return a.servicePool
 }
 
 func (a *Application) ServicePool() interface{} {
 	return a.servicePool
-}
-
-// services
-
-// Service is a pool where all the services will be embedded.
-type Service struct {
-	*temp.Temp
-}
-
-func NewService(app *Application) Service {
-	return Service{
-		Temp: temp.NewService(app),
-	}
 }

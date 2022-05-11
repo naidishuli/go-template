@@ -1,7 +1,7 @@
 package temp
 
 import (
-	"go-template/internal/services"
+	"go-template/internal/interfaces"
 )
 
 //go:generate mockgen -source temp.go -package temp -destination temp_mock.go
@@ -15,7 +15,7 @@ type Temp struct {
 }
 
 // NewService create a new services of type Temp.
-func NewService(ctx services.Context) *Temp {
+func NewService(ctx interfaces.ServiceContext) *Temp {
 	return &Temp{
 		repo: ctx.Repository(),
 	}
