@@ -2,20 +2,19 @@ package repository
 
 import (
 	"fmt"
-
-	"gorm.io/gorm"
+	"go-template/internal/app"
 )
 
 type Temp struct {
-	db *gorm.DB
+	repo *repository
 }
 
-func NewTemp(db *gorm.DB) *Temp {
-	return &Temp{db}
+func NewTemp(repo *repository) *Temp {
+	return &Temp{repo}
 }
 
 // DoSomethingTemp this is an example to follow.
-func (t *Temp) DoSomethingTemp(arg string) error {
+func (t *Temp) DoSomethingTemp(arg string, ctx *app.Context) error {
 	fmt.Println(arg)
 	return nil
 }

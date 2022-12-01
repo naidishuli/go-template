@@ -2,8 +2,22 @@ package repository
 
 import "gorm.io/gorm"
 
+type Repository interface {
+	Create(ctx *Context, value interface{}, opts ...QueryOption) error
+	Count(ctx *Context, count *int64, opts ...QueryOption) error
+	Find(ctx *Context, out interface{}, opts ...QueryOption) error
+	First(ctx *Context, out interface{}, opts ...QueryOption) error
+	Pluck(ctx *Context, col string, out interface{}, opts ...QueryOption) error
+	Update(ctx *Context, col string, val interface{}, opts ...QueryOption) (int64, error)
+	Updates(ctx *Context, val interface{}, opts ...QueryOption) (int64, error)
+}
+
 type repository struct {
 	db *gorm.DB
+}
+
+func New(db *gorm.DB) *repository {
+	return &repository{db: db}
 }
 
 func (r *repository) Create(ctx *Context, value interface{}, opts ...QueryOption) error {

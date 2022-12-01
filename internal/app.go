@@ -1,58 +1,73 @@
 package internal
 
 import (
+	"go-template/internal/app"
+	"go-template/internal/config"
+	"go-template/internal/services/temp"
+	"go-template/pkg/jwt"
 	"gorm.io/gorm"
 
-	"go-template/internal/pkg"
 	"go-template/internal/repository"
-	"go-template/internal/services"
 )
 
 type Application struct {
 	db             *gorm.DB
-	pkgPool        *pkg.Pool
-	repositoryPool *repository.Pool
-	servicePool    *services.Pool
+	pkgPool        *app.Pkg
+	repositoryPool *app.Repository
+	servicePool    *app.Service
 }
 
 func NewApplication() (*Application, error) {
-	app := Application{}
+	appl := Application{}
 
-	app.pkgPool = new(pkg.Pool)
-	app.repositoryPool = new(repository.Pool)
-	app.servicePool = new(services.Pool)
+	appl.pkgPool = new(app.Pkg)
+	appl.repositoryPool = new(app.Repository)
+	appl.servicePool = new(app.Service)
 
-	pkgPool, err := pkg.NewPool()
+	pkgPool, err := initializePkg(&appl)
 	if err != nil {
 		return nil, err
 	}
-	*app.pkgPool = pkgPool
+	*appl.pkgPool = pkgPool
 
-	repositoryPool := repository.NewPool(app.db)
-	*app.repositoryPool = repositoryPool
+	*appl.repositoryPool = initializeRepository(appl.db)
+	*appl.servicePool = initializeService(&appl)
 
-	servicePool := services.NewPool(&app)
-	*app.servicePool = servicePool
-
-	return &app, nil
+	return &appl, nil
 }
 
 func (a *Application) DB() *gorm.DB {
 	return a.db
 }
 
-func (a *Application) Pkg() *pkg.Pool {
+func (a *Application) Pkg() *app.Pkg {
 	return a.pkgPool
 }
 
-func (a *Application) Repository() *repository.Pool {
+func (a *Application) Repository() *app.Repository {
 	return a.repositoryPool
 }
 
-func (a *Application) Service() *services.Pool {
+func (a *Application) Service() *app.Service {
 	return a.servicePool
 }
 
-func (a *Application) ServicePool() interface{} {
-	return a.servicePool
+func initializeRepository(db *gorm.DB) app.Repository {
+	repo := repository.New(db)
+
+	return app.Repository{
+		Temp: repository.NewTemp(repo),
+	}
+}
+
+func initializeService(appl *Application) app.Service {
+	return app.Service{
+		Temp: temp.NewService(appl),
+	}
+}
+
+func initializePkg(appl *Application) (app.Pkg, error) {
+	return app.Pkg{
+		JWT: jwt.New(config.Env.JwtVerificationKey),
+	}, nil
 }
