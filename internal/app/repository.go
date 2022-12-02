@@ -1,5 +1,11 @@
 package app
 
+type DBName string
+
+const (
+	DefaultDB DBName = "default"
+)
+
 type Repository struct {
 	Temp TempRepo
 }

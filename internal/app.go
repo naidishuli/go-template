@@ -3,11 +3,10 @@ package internal
 import (
 	"go-template/internal/app"
 	"go-template/internal/config"
+	tempRepo "go-template/internal/repository/temp"
 	"go-template/internal/services/temp"
 	"go-template/pkg/jwt"
 	"gorm.io/gorm"
-
-	"go-template/internal/repository"
 )
 
 type Application struct {
@@ -53,10 +52,8 @@ func (a *Application) Service() *app.Service {
 }
 
 func initializeRepository(db *gorm.DB) app.Repository {
-	repo := repository.New(db)
-
 	return app.Repository{
-		Temp: repository.NewTemp(repo),
+		Temp: tempRepo.NewTemp(db),
 	}
 }
 
