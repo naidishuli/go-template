@@ -2,48 +2,13 @@ package postgresdb
 
 import (
 	"fmt"
-	"os"
-	"regexp"
-	"strconv"
-
 	_ "github.com/lib/pq"
+	"go-template/internal/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"os"
 )
-
-var dbUrlRegex = regexp.MustCompile("//(.+):(.+)@(.+):(.+)/(.+)")
-
-type Config struct {
-	Url                string
-	Host               string
-	Port               int
-	Username           string
-	Password           string
-	Database           string
-	SSLMode            string
-	MaxIdleConnections int
-	MaxOpenConnections int
-}
-
-func (c *Config) parse() {
-	if c.MaxOpenConnections == 0 {
-		c.MaxOpenConnections = 50
-	}
-
-	if c.MaxIdleConnections == 0 {
-		c.MaxIdleConnections = 50
-	}
-
-	if c.Url != "" {
-		parts := dbUrlRegex.FindStringSubmatch(c.Url)
-		c.Username = parts[1]
-		c.Password = parts[2]
-		c.Host = parts[3]
-		c.Port, _ = strconv.Atoi(parts[4])
-		c.Database = parts[5]
-	}
-}
 
 func New(config Config) (*gorm.DB, error) {
 	config.parse()
@@ -90,5 +55,20 @@ func New(config Config) (*gorm.DB, error) {
 	dbRef.SetMaxIdleConns(config.MaxIdleConnections)
 	dbRef.SetMaxOpenConns(config.MaxOpenConnections)
 
+	if config.SaveSQLAfterExecution {
+		db.Callback().Query().Register("*", dbStatementCallback)
+		db.Callback().Create().Register("*", dbStatementCallback)
+		db.Callback().Update().Register("*", dbStatementCallback)
+		db.Callback().Delete().Register("*", dbStatementCallback)
+		db.Callback().Row().Register("*", dbStatementCallback)
+		db.Callback().Raw().Register("*", dbStatementCallback)
+	}
+
 	return db, nil
+}
+
+func dbStatementCallback(db *gorm.DB) {
+	stmt := db.Statement
+	sqlQuery := db.Dialector.Explain(stmt.SQL.String(), stmt.Vars...)
+	db.Set(config.GormSQLKey, sqlQuery)
 }
