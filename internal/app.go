@@ -6,6 +6,7 @@ import (
 	tempRepo "go-template/internal/repository/temp"
 	"go-template/internal/services/temp"
 	"go-template/pkg/jwt"
+	"go-template/pkg/logger"
 	"gorm.io/gorm"
 )
 
@@ -14,10 +15,13 @@ type Application struct {
 	pkgPool        *app.Pkg
 	repositoryPool *app.Repository
 	servicePool    *app.Service
+	logger         app.Logger
 }
 
 func NewApplication() (*Application, error) {
-	appl := Application{}
+	appl := Application{
+		logger: logger.NewLogger(nil, nil),
+	}
 
 	appl.pkgPool = new(app.Pkg)
 	appl.repositoryPool = new(app.Repository)
@@ -29,7 +33,7 @@ func NewApplication() (*Application, error) {
 	}
 	*appl.pkgPool = pkgPool
 
-	*appl.repositoryPool = initializeRepository(appl.db)
+	*appl.repositoryPool = initializeRepository(&appl)
 	*appl.servicePool = initializeService(&appl)
 
 	return &appl, nil
@@ -51,9 +55,13 @@ func (a *Application) Service() *app.Service {
 	return a.servicePool
 }
 
-func initializeRepository(db *gorm.DB) app.Repository {
+func (a *Application) Log() app.Logger {
+	return a.logger
+}
+
+func initializeRepository(appl *Application) app.Repository {
 	return app.Repository{
-		Temp: tempRepo.NewTemp(db),
+		Temp: tempRepo.NewTemp(appl),
 	}
 }
 

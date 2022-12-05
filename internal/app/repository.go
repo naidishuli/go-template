@@ -1,6 +1,6 @@
 package app
 
-//go:generate mockgen -source repository.go -package app -destination mocks/repository_mock.go
+//go:generate mockgen -source repository.go -package mocks -destination mocks/repository_mock.go
 
 type DBName string
 
@@ -13,5 +13,5 @@ type Repository struct {
 }
 
 type TempRepo interface {
-	DoSomethingTemp(arg string, ctx *Context) error
+	DoSomethingTemp(arg string, ctx Context) error
 }

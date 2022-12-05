@@ -7,7 +7,7 @@ import (
 	"go-template/api/controllers"
 )
 
-//go:generate mockgen -source controller.go -package temp -destination mocks/controller_mock.go
+//go:generate mockgen -source controller.go -package mocks -destination mocks/controller_mock.go
 
 type Controller struct {
 	*controllers.Common

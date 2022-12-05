@@ -1,24 +1,28 @@
 package temp
 
 import (
-	"fmt"
 	"go-template/internal/app"
 	"gorm.io/gorm"
 )
 
 type Temp struct {
-	db *gorm.DB
+	db  *gorm.DB
+	log app.Logger
 }
 
-func NewTemp(db *gorm.DB) *Temp {
-	return &Temp{db: db}
+func NewTemp(app app.App) *Temp {
+	return &Temp{
+		db:  app.DB(),
+		log: app.Log(),
+	}
 }
 
 // DoSomethingTemp this is an example to follow.
-func (t *Temp) DoSomethingTemp(arg string, c *app.Context) error {
-	ctx := app.NewContext(c)
-	db := ctx.DB(t.db)
+func (t *Temp) DoSomethingTemp(arg string, ctx app.Context) error {
+	c := app.NewContext(ctx)
+	db := c.DB(t.db)
+	log := ctx.Log(nil)
 
-	fmt.Println("do something with the db", db)
+	log.Info("do something with the db", db)
 	return nil
 }

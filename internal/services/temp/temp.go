@@ -6,7 +6,9 @@ import (
 )
 
 type Temp struct {
-	db       *gorm.DB
+	db  *gorm.DB
+	log app.Logger
+
 	tempRepo app.TempRepo
 }
 
@@ -14,22 +16,25 @@ type Temp struct {
 func NewService(ctx app.App) *Temp {
 	return &Temp{
 		db:       ctx.DB(),
+		log:      ctx.Log(),
 		tempRepo: ctx.Repository().Temp,
 	}
 }
 
 // DoSomething used as an example to follow.
-func (t *Temp) DoSomething(arg string, c *app.Context) error {
-	return t.tempRepo.DoSomethingTemp(arg, c)
+func (t *Temp) DoSomething(arg string, ctx app.Context) error {
+	return t.tempRepo.DoSomethingTemp(arg, ctx)
 }
 
 // DoSomethingTransaction used as an example to follow.
-func (t *Temp) DoSomethingTransaction(arg string, c *app.Context) error {
-	ctx := app.NewContext(c)
-	db := ctx.DB(t.db)
+func (t *Temp) DoSomethingTransaction(arg string, ctx app.Context) error {
+	c := app.NewContext(ctx)
+	db := c.DB(t.db)
 
 	return db.Transaction(func(tx *gorm.DB) error {
-		ctx.TX = tx
+		c.SetTransaction(tx)
+		defer c.ClearTransaction()
+
 		return t.tempRepo.DoSomethingTemp(arg, ctx)
 	})
 }

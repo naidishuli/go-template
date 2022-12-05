@@ -11,7 +11,7 @@ import (
 	"go-template/internal/model"
 )
 
-//go:generate mockgen -source common.go -package middlewares -destination mocks/common_mock.go
+//go:generate mockgen -source common.go -package mocks -destination mocks/common_mock.go
 
 type Pkg interface {
 	VerifyDataToken(header string, data interface{}) error
