@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"go-template/api/apierror"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -18,7 +19,7 @@ func main() {
 	}
 
 	fiberApp := fiber.New(fiber.Config{
-		ErrorHandler: api.ErrorHandler,
+		ErrorHandler: apierror.ErrorHandler,
 	})
 
 	fiberApp.Use(cors.New(cors.Config{

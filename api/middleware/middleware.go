@@ -41,8 +41,10 @@ func (a *Middleware) Authorize(ctx *fiber.Ctx) error {
 
 	err := a.pkg.VerifyDataToken(authHeader, &user)
 	if err != nil {
-		return apierror.Unauthorized(nil, err)
+		return apierror.Unauthorized(err, nil)
 	}
+
+	//todo add user access, roles etc...
 
 	userCtx := context.WithValue(context.Background(), UserContext, user)
 	ctx.SetUserContext(userCtx)

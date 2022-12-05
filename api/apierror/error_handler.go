@@ -1,21 +1,14 @@
-package api
+package apierror
 
 import (
 	"github.com/gofiber/fiber/v2"
-
-	"go-template/api/apierror"
-	"go-template/internal/config"
 )
 
 // ErrorHandler is a used as the default errors handler
 func ErrorHandler(ctx *fiber.Ctx, err error) error {
-	apiError, ok := err.(*apierror.ApiError)
+	apiError, ok := err.(*Error)
 	if !ok {
-		apiError = apierror.New(err)
-	}
-
-	if config.Env.IsProduction() {
-		apiError.Developer = nil
+		apiError = New(err)
 	}
 
 	return ctx.Status(apiError.Status).JSON(apiError)

@@ -1,28 +1,69 @@
 package apierror
 
-func Unauthorized(details, devDetails interface{}) *ApiError {
-	return &ApiError{
-		Status:  401,
-		Message: "Unauthorized",
-		Details: details,
-		Developer: &developer{
-			Details: devDetails,
+import "go-template/internal/app"
+
+func Unauthorized(err error, details map[string]interface{}) *Error {
+	return &Error{
+		Status: 401,
+		Response: Response{
+			Message: "Unauthorized",
+			Details: map[string]interface{}{
+				"reason": details["reason"],
+			},
+		},
+		err: app.NewError(app.UndefinedErr, err, details),
+	}
+}
+
+func BadRequest(err error, details interface{}) *Error {
+	return &Error{
+		Status: 400,
+		Response: Response{
+			Message: "Bad request",
+			Details: details,
+		},
+		err: app.NewError(app.UndefinedErr, err, nil),
+	}
+}
+
+func BadRequestMalformed(err error) *Error {
+	return &Error{
+		Status: 400,
+		Response: Response{
+			Message: "Bad request",
+			Details: map[string]interface{}{
+				"error": "malformed request",
+			},
+		},
+		err: app.NewError(app.UndefinedErr, err, nil),
+	}
+}
+
+func InternalServerError(err error) *Error {
+	return &Error{
+		Status: 500,
+		Response: Response{
+			Message: "Internal server error",
+		},
+		err: app.NewError(app.UndefinedErr, err, nil),
+	}
+}
+
+func NoPermission() *Error {
+	return &Error{
+		Status: 401,
+		Response: Response{
+			Message: "User has no permission",
 		},
 	}
 }
 
-func BadRequest(err error, details interface{}) *ApiError {
-	apiError := &ApiError{
-		Status:  400,
-		Message: "BadRequest",
-		Details: details,
+func NotFound() *Error {
+	return &Error{
+		Status: 404,
+		Response: Response{
+			Message: "Resource not found",
+			Details: nil,
+		},
 	}
-
-	if err != nil {
-		apiError.Developer = &developer{
-			Details: err,
-		}
-	}
-
-	return apiError
 }
