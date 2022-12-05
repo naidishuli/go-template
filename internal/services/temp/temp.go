@@ -5,8 +5,6 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate mockgen -source temp.go -package temp -destination temp_mock.go
-
 type Temp struct {
 	db       *gorm.DB
 	tempRepo app.TempRepo

@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"go-template/api/apierror"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
+	"go-template/api/routes"
+	"time"
 
 	"go-template/api"
 	"go-template/internal"
@@ -13,20 +11,17 @@ import (
 )
 
 func main() {
+	location, err := time.LoadLocation("UTC")
+	time.Local = location
+
 	app, err := internal.NewApplication()
 	if err != nil {
 		panic(err)
 	}
 
-	fiberApp := fiber.New(fiber.Config{
-		ErrorHandler: apierror.ErrorHandler,
-	})
+	fiberApp := api.New()
 
-	fiberApp.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-	}))
-
-	api.RegisterRoutes(app, fiberApp)
+	routes.RegisterRoutes(app, fiberApp)
 	err = fiberApp.Listen(fmt.Sprintf(":%d", config.Env.Port))
 	if err != nil {
 		panic(err)

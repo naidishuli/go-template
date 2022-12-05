@@ -1,14 +1,17 @@
-package middleware
+package middlewares
 
 import (
 	"context"
+	"go-template/api"
+	"go-template/internal/app"
 
 	"github.com/gofiber/fiber/v2"
 
 	"go-template/api/apierror"
-	"go-template/internal"
 	"go-template/internal/model"
 )
+
+//go:generate mockgen -source common.go -package middlewares -destination mocks/common_mock.go
 
 type Pkg interface {
 	VerifyDataToken(header string, data interface{}) error
@@ -20,14 +23,14 @@ type Repository interface {
 type Service interface {
 }
 
-type Middleware struct {
+type Common struct {
 	pkg     Pkg
 	repo    Repository
 	service Service
 }
 
-func New(app *internal.Application) *Middleware {
-	return &Middleware{
+func NewCommon(app app.App) *Common {
+	return &Common{
 		pkg:     app.Pkg(),
 		repo:    app.Repository(),
 		service: app.Service(),
@@ -35,18 +38,18 @@ func New(app *internal.Application) *Middleware {
 }
 
 // Authorize validates the jwt token passed and inject the user data to the request context.
-func (a *Middleware) Authorize(ctx *fiber.Ctx) error {
+func (c *Common) Authorize(ctx *fiber.Ctx) error {
 	var user model.User
 	authHeader := ctx.Get("authorization")
 
-	err := a.pkg.VerifyDataToken(authHeader, &user)
+	err := c.pkg.VerifyDataToken(authHeader, &user)
 	if err != nil {
 		return apierror.Unauthorized(err, nil)
 	}
 
-	//todo add user access, roles etc...
+	//todo inject to the user its access, roles etc...
 
-	userCtx := context.WithValue(context.Background(), UserContext, user)
+	userCtx := context.WithValue(context.Background(), api.UserCtx, user)
 	ctx.SetUserContext(userCtx)
 	return ctx.Next()
 }

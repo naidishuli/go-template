@@ -1,5 +1,7 @@
 package app
 
+//go:generate mockgen -source repository.go -package app -destination mocks/repository_mock.go
+
 type DBName string
 
 const (

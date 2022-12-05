@@ -2,17 +2,19 @@ package temp
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"go-template/api/responses"
 
 	"go-template/api/controllers"
-	"go-template/api/response"
 )
 
+//go:generate mockgen -source controller.go -package temp -destination mocks/controller_mock.go
+
 type Controller struct {
-	*controllers.Context
+	*controllers.Common
 }
 
-func NewController(ctx *controllers.Context) Controller {
-	return Controller{Context: ctx}
+func NewController(ctx *controllers.Common) Controller {
+	return Controller{Common: ctx}
 }
 
 // DoSomething does something
@@ -28,5 +30,5 @@ func NewController(ctx *controllers.Context) Controller {
 // @Failure 500 {object} response.ErrorInternalServerError
 // @Router /temp/{id} [get]
 func (c *Controller) DoSomething(ctx *fiber.Ctx) error {
-	return ctx.JSON(response.StatusOk{Status: "ok"})
+	return ctx.JSON(responses.StatusOk{Status: "ok"})
 }
