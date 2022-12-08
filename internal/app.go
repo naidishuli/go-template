@@ -39,23 +39,23 @@ func NewApplication() (*Application, error) {
 	return &appl, nil
 }
 
-func (a *Application) DB() *gorm.DB {
+func (a Application) DB() *gorm.DB {
 	return a.db
 }
 
-func (a *Application) Pkg() *app.Pkg {
+func (a Application) Pkg() *app.Pkg {
 	return a.pkgPool
 }
 
-func (a *Application) Repository() *app.Repository {
+func (a Application) Repository() *app.Repository {
 	return a.repositoryPool
 }
 
-func (a *Application) Service() *app.Service {
+func (a Application) Service() *app.Service {
 	return a.servicePool
 }
 
-func (a *Application) Log() app.Logger {
+func (a Application) Log() app.Logger {
 	return a.logger
 }
 

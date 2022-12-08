@@ -29,6 +29,6 @@ func NewController(ctx *controllers.Common) Controller {
 // @Failure 404 {object} response.ErrorNotFound
 // @Failure 500 {object} response.ErrorInternalServerError
 // @Router /temp/{id} [get]
-func (c *Controller) DoSomething(ctx *fiber.Ctx) error {
+func (c Controller) DoSomething(ctx *fiber.Ctx) error {
 	return ctx.JSON(responses.StatusOk{Status: "ok"})
 }

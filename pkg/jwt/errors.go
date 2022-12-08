@@ -2,17 +2,17 @@ package jwt
 
 import "fmt"
 
-type ErrorType string
+type ErrorReason string
 
 const (
-	MalformedErr    ErrorType = "Malformed token"
-	VerificationErr ErrorType = "Error verification method"
-	InvalidErr      ErrorType = "Invalid token"
-	SignTokenErr    ErrorType = "Error signing token"
+	MalformedErr    ErrorReason = "Malformed token"
+	VerificationErr ErrorReason = "Error verification method"
+	InvalidErr      ErrorReason = "Invalid token"
+	SignTokenErr    ErrorReason = "Error signing token"
 )
 
 type tokenError struct {
-	reason  ErrorType
+	reason  ErrorReason
 	message string
 }
 

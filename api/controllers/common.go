@@ -16,15 +16,15 @@ func NewContext(app app.App) *Common {
 	return &Common{app}
 }
 
-func (c *Common) App() app.App {
+func (c Common) App() app.App {
 	return c.app
 }
 
-func (c *Common) User(ctx *fiber.Ctx) model.User {
+func (c Common) User(ctx *fiber.Ctx) model.User {
 	return ctx.UserContext().Value(api.UserCtx).(model.User)
 }
 
-func (c *Common) UserAccess(ctx *fiber.Ctx) (model.User, app.UserAccess, error) {
+func (c Common) UserAccess(ctx *fiber.Ctx) (model.User, app.UserAccess, error) {
 	user := c.User(ctx)
 
 	//todo here we can get the access injected to the user

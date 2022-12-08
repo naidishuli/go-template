@@ -38,7 +38,7 @@ func NewCommon(app app.App) *Common {
 }
 
 // Authorize validates the jwt token passed and inject the user data to the request context.
-func (c *Common) Authorize(ctx *fiber.Ctx) error {
+func (c Common) Authorize(ctx *fiber.Ctx) error {
 	var user model.User
 	authHeader := ctx.Get("authorization")
 
