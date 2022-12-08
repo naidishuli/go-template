@@ -13,5 +13,5 @@ type Repository struct {
 }
 
 type TempRepo interface {
-	DoSomethingTemp(arg string, ctx Context) error
+	DoSomethingTemp(ctx *Context, arg string) error
 }

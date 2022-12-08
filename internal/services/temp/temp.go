@@ -22,19 +22,17 @@ func NewService(ctx app.App) *Temp {
 }
 
 // DoSomething used as an example to follow.
-func (t *Temp) DoSomething(arg string, ctx app.Context) error {
-	return t.tempRepo.DoSomethingTemp(arg, ctx)
+func (t *Temp) DoSomething(ctx *app.Context, arg string) error {
+	return t.tempRepo.DoSomethingTemp(ctx, arg)
 }
 
 // DoSomethingTransaction used as an example to follow.
-func (t *Temp) DoSomethingTransaction(arg string, ctx app.Context) error {
-	c := app.NewContext(ctx)
-	db := c.DB(t.db)
+func (t *Temp) DoSomethingTransaction(ctx *app.Context, arg string) error {
+	iCtx := app.ContextWithDefaults(ctx, app.CtxOption{DB: t.db, Log: t.log})
 
-	return db.Transaction(func(tx *gorm.DB) error {
-		c.SetTransaction(tx)
-		defer c.ClearTransaction()
-
-		return t.tempRepo.DoSomethingTemp(arg, ctx)
+	return iCtx.DB.Transaction(func(tx *gorm.DB) error {
+		// changes to ctx here will not affect the original context passed in parameters
+		iCtx.DB = tx
+		return t.tempRepo.DoSomethingTemp(iCtx, arg)
 	})
 }

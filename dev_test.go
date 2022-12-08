@@ -19,20 +19,25 @@ import (
 //	fmt.Println(check)
 //}
 
-type E struct {
-	Message string
+type Ctx struct {
+	I *int
+	S string
 }
-
-func (e *E) String() {
-	fmt.Println(e.Message)
-}
-
-type EE E
 
 func TestS(t *testing.T) {
-	var m map[string]interface{}
+	i := 5
+	fc := &Ctx{
+		I: &i,
+		S: "This is s",
+	}
 
-	//a := m["dasd"]
+	var fc1 Ctx
+	fc1 = *fc
 
-	fmt.Println(m == nil)
+	newI := 78
+
+	fc1.I = &newI
+
+	fmt.Println(*fc.I)
+	fmt.Println(*fc1.I)
 }

@@ -7,5 +7,6 @@ type Service struct {
 }
 
 type TempService interface {
-	DoSomething(arg string, ctx Context) error
+	DoSomething(ctx *Context, arg string) error
+	DoSomethingTransaction(ctx *Context, arg string) error
 }
