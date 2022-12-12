@@ -1,4 +1,4 @@
-package temp
+package repository
 
 import (
 	"go-template/internal/app"

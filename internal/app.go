@@ -3,7 +3,7 @@ package internal
 import (
 	"go-template/internal/app"
 	"go-template/internal/config"
-	tempRepo "go-template/internal/repository/temp"
+	tempRepo "go-template/internal/repository"
 	"go-template/internal/services/temp"
 	"go-template/pkg/jwt"
 	"go-template/pkg/logger"
