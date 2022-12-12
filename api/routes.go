@@ -1,17 +1,17 @@
-package routes
+package api
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"go-template/api/common"
 	"go-template/api/middlewares"
 	"go-template/internal/app"
 
-	"go-template/api/controllers"
 	"go-template/api/controllers/temp"
 )
 
 // RegisterRoutes used to register api routes to their handlers.
 func RegisterRoutes(app app.App, fiberApp *fiber.App) {
-	ctxController := controllers.NewContext(app)
+	ctxController := common.NewContext(app)
 	generalMiddlewares := middlewares.NewCommon(app)
 
 	// initialize all controllers here

@@ -2,18 +2,17 @@ package temp
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"go-template/api/common"
 	"go-template/api/responses"
-
-	"go-template/api/controllers"
 )
 
 //go:generate mockgen -source controller.go -package mocks -destination mocks/controller_mock.go
 
 type Controller struct {
-	*controllers.Common
+	*common.Common
 }
 
-func NewController(ctx *controllers.Common) Controller {
+func NewController(ctx *common.Common) Controller {
 	return Controller{Common: ctx}
 }
 

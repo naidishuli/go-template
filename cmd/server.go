@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"go-template/api/routes"
 	"time"
 
 	"go-template/api"
@@ -21,7 +20,7 @@ func main() {
 
 	fiberApp := api.New()
 
-	routes.RegisterRoutes(app, fiberApp)
+	api.RegisterRoutes(app, fiberApp)
 	err = fiberApp.Listen(fmt.Sprintf(":%d", config.Env.Port))
 	if err != nil {
 		panic(err)

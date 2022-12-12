@@ -1,8 +1,7 @@
-package controllers
+package common
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"go-template/api"
 	"go-template/internal/app"
 
 	"go-template/internal/model"
@@ -21,7 +20,7 @@ func (c Common) App() app.App {
 }
 
 func (c Common) User(ctx *fiber.Ctx) model.User {
-	return ctx.UserContext().Value(api.UserCtx).(model.User)
+	return ctx.UserContext().Value(UserCtx).(model.User)
 }
 
 func (c Common) UserAccess(ctx *fiber.Ctx) (model.User, app.UserAccess, error) {

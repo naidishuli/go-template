@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"context"
-	"go-template/api"
+	"go-template/api/common"
 	"go-template/internal/app"
 
 	"github.com/gofiber/fiber/v2"
@@ -49,7 +49,7 @@ func (c Common) Authorize(ctx *fiber.Ctx) error {
 
 	//todo inject to the user its access, roles etc...
 
-	userCtx := context.WithValue(context.Background(), api.UserCtx, user)
+	userCtx := context.WithValue(context.Background(), common.UserCtx, user)
 	ctx.SetUserContext(userCtx)
 	return ctx.Next()
 }
