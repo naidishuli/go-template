@@ -13,7 +13,8 @@ func main() {
 	location, err := time.LoadLocation("UTC")
 	time.Local = location
 
-	app, err := internal.NewApplication()
+	app := internal.NewApplication()
+	err = internal.InitializeApp(app, internal.ApplicationConfig{})
 	if err != nil {
 		panic(err)
 	}

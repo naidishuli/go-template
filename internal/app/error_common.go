@@ -6,20 +6,8 @@ import (
 	"go-template/internal/config"
 	"go-template/utils"
 	"gorm.io/gorm"
+	"strings"
 )
-
-func NotFoundError(typ interface{}, err error, data ErrData) *Error {
-	if err == nil {
-		err = errors.New("not found")
-	}
-
-	e := NewError(NotFoundErr, err, data)
-
-	resourceType := fmt.Sprintf(" %s", utils.TypeName(typ))
-	e.Message = fmt.Sprintf("Not found%s", resourceType)
-
-	return e
-}
 
 func GormErr(tx *gorm.DB, data ErrData) error {
 	if tx.Error == nil {
@@ -28,28 +16,31 @@ func GormErr(tx *gorm.DB, data ErrData) error {
 
 	var err *Error
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
-		err = NotFoundError(tx.Statement.Model, tx.Error, data)
+		err = NotFoundError(tx.Statement.Model, data)
+	} else if errors.Is(tx.Error, gorm.ErrDuplicatedKey) {
+		err = &Error{Code: ErrDuplicateKey, Err: tx.Error, Data: data}
 	} else {
-		err = NewError(DatabaseErr, tx.Error, data)
+		err = &Error{Code: ErrDatabase, Err: tx.Error, Data: data}
 	}
 
 	val, _ := tx.Get(config.GormSQLKey)
 	str, ok := val.(string)
 	if ok {
-		if err.ErrData == nil {
-			err.ErrData = make(map[string]interface{})
-			err.ErrData[config.GormSQLKey] = str
+		if err.Data == nil {
+			err.Data = make(map[string]interface{})
+			err.Data[config.GormSQLKey] = str
 		}
 	}
 
 	return err
 }
 
-func IsErr(err interface{}, code ErrCode) bool {
-	appErr, ok := err.(*Error)
-	if !ok {
-		return false
-	}
+func NotFoundError(typ interface{}, data ErrData) *Error {
+	resourceType := fmt.Sprintf("%s", strings.ToLower(utils.TypeName(typ)))
 
-	return appErr.Code == code
+	return &Error{
+		Code:    ErrNotFound,
+		Message: fmt.Sprintf("%s not found", resourceType),
+		Data:    data,
+	}
 }

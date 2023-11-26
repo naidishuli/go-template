@@ -3,37 +3,33 @@ package common
 import (
 	"github.com/gofiber/fiber/v2"
 	"go-template/internal/app"
-
-	"go-template/internal/model"
+	"net/url"
 )
 
-type Common struct {
+type Controller struct {
 	app app.App
 }
 
-func NewContext(app app.App) *Common {
-	return &Common{app}
+func NewController(app app.App) *Controller {
+	return &Controller{app}
 }
 
-func (c Common) App() app.App {
+func (c Controller) App() app.App {
 	return c.app
 }
 
-func (c Common) User(ctx *fiber.Ctx) model.User {
-	return ctx.UserContext().Value(UserCtx).(model.User)
-}
+func (c Controller) RedirectWithData(ctx *fiber.Ctx, redirectURL string, data map[string]string) error {
+	parsedURL, err := url.Parse(redirectURL)
+	if err != nil {
+		return err
+	}
 
-func (c Common) UserAccess(ctx *fiber.Ctx) (model.User, app.UserAccess, error) {
-	user := c.User(ctx)
+	params := url.Values{}
+	for k, v := range data {
+		params.Add(k, v)
+	}
 
-	//todo here we can get the access injected to the user
+	parsedURL.RawQuery = params.Encode()
 
-	//access, ok := user.Access.(interfaces.Access)
-	//if !ok {
-	//	err := errors.New("access interface conversion error")
-	//	c.log.Errorf("%+v\n", err)
-	//	return user, nil, apierror.InternalServerError(err)
-	//}
-
-	return user, nil, nil
+	return ctx.Redirect(parsedURL.String())
 }

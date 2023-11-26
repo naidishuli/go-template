@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Initialize(appl *Application, cfg ApplicationConfig) error {
+func InitializeApp(appl *Application, cfg ApplicationConfig) error {
 	if !cfg.NoDB {
 		db, err := initializeDB()
 		if err != nil {

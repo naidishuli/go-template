@@ -1,4 +1,4 @@
-package responses
+package response
 
 // StatusOk 200
 type StatusOk struct {

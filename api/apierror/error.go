@@ -2,6 +2,7 @@ package apierror
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"go-template/internal/app"
 	"go-template/internal/config"
@@ -17,7 +18,39 @@ type Error struct {
 	Status int `json:"-"`
 	Response
 
-	err *app.Error
+	err error
+}
+
+// New return a new ApiError based on the errors passed on argument
+func New(err error) *Error {
+	var message string
+	wErr := err
+
+	for {
+		appErr, ok := wErr.(*app.Error)
+		if ok {
+			return apiErrorFromAppError(appErr, message)
+		}
+
+		message = err.Error()
+		wErr = errors.Unwrap(wErr)
+		if wErr == nil {
+			break
+		}
+	}
+
+	dErr, ok := apiErrorFromDomainError(err)
+	if ok {
+		return dErr
+	}
+
+	return &Error{
+		Status: 500,
+		Response: Response{
+			Message: "Internal server error",
+		},
+		err: &app.Error{Code: app.ErrUndefined, Err: err},
+	}
 }
 
 // Error used to implement errors interface
@@ -25,67 +58,94 @@ func (e *Error) Error() string {
 	return e.Message
 }
 
-func (e *Error) Log() string {
-	var code, message, trace, sql string
+// trace used to return the line of the code that creates the errors
+// func trace() string {
+//	pcs := make([]uintptr, 100)
+//	runtime.Callers(2, pcs)
+//	callersFrames := runtime.CallersFrames(pcs)
+//
+//	var trace string
+//	for {
+//		cf, more := callersFrames.Next()
+//		if !more {
+//			break
+//		}
+//
+//		frameInfo := cf.Function
+//		frameInfo = fmt.Sprintf("%s\n\t%s:%d", frameInfo, cf.File, cf.Line)
+//		trace = fmt.Sprintf("%s\n%s", trace, frameInfo)
+//	}
+//
+//	return trace
+// }
 
-	if e.err != nil {
-		code = string(e.err.Code)
-		message = e.err.Message
-		trace = e.err.Trace
-		sql, _ = e.err.ErrData[config.GormSQLKey].(string)
+// todo add trace
+func (e *Error) Log() string {
+	var code, message, details, trace, sql string
+	var err error
+
+	appErr, isAppErr := e.err.(*app.Error)
+
+	if isAppErr {
+		err = appErr.UnderlyingErr()
+		code = string(appErr.Code)
+		message = appErr.Message
+		sql, _ = appErr.Data[config.GormSQLKey].(string)
+
+		data, _ := json.Marshal(appErr.Data)
+		details = string(data)
 	} else {
 		data, _ := json.Marshal(e.Response)
 		message = string(data)
+
+		dataDetails, _ := json.Marshal(e.Details)
+		details = string(dataDetails)
 	}
 
 	return fmt.Sprintf(
-		"Code: %s\n\nMessage: %s\n\nStack: \t%s\n\nSql: \t%s\n"+
+		"\n\nError: %s\n\nCode: %s\n\nMessage: %s\n\nDetails: %s\n\nStack: \t%s\n\nSql: \t%s\n"+
 			"--------------------------------------------------------------------------------------------------------------\n",
+		err,
 		code,
 		message,
+		details,
 		trace,
 		sql,
 	)
 }
 
-// New return a new ApiError based on the errors passed on argument
-func New(err error) *Error {
-	var apiError *Error
+// apiErrorFromAppError transform internal error to an api error
+func apiErrorFromAppError(err *app.Error, msg string) *Error {
+	apiError := &Error{
+		err: err,
+	}
 
-	switch err.(type) {
-	case *app.Error:
-		apiError = apiErrorFromError(err.(*app.Error))
+	switch err.Code {
+	case app.ErrNotFound:
+		apiError.Status = 404
+		apiError.Message = err.Message
 	default:
-		apiError = &Error{
-			Status: 500,
-			Response: Response{
-				Message: "Internal server error",
-			},
-			err: app.NewError(app.UndefinedErr, err, nil),
+		apiError.Status = 500
+		apiError.Message = "Internal server error"
+
+		dErr, ok := apiErrorFromDomainError(err.Err)
+		if ok {
+			apiError.Status = dErr.Status
+			apiError.Message = dErr.Message
 		}
 	}
 
 	return apiError
 }
 
-// apiErrorFromError transform internal error to an api error
-func apiErrorFromError(err *app.Error) *Error {
-	if err == nil {
-		return nil
-	}
+func apiErrorFromDomainError(err error) (*Error, bool) {
+	apiError := &Error{}
+	ok := true
 
-	apiError := &Error{
-		err: err,
-	}
-
-	switch err.Code {
-	case app.NotFoundErr:
-		apiError.Status = 404
-		apiError.Message = err.Message
+	switch {
 	default:
-		apiError.Status = 500
-		apiError.Message = "Internal server error"
+		ok = false
 	}
 
-	return apiError
+	return apiError, ok
 }

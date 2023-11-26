@@ -9,26 +9,24 @@ import (
 type ErrCode string
 
 const (
-	UndefinedErr ErrCode = "Error.Undefined"
+	ErrUndefined ErrCode = "Error.Undefined"
 
-	TokenGenerateErr ErrCode = "Error.Token.Generate"
+	ErrDatabase     ErrCode = "Error.Repository.Database"
+	ErrNotFound     ErrCode = "Error.Repository.NotFound"
+	ErrDuplicateKey ErrCode = "Error.Repository.DuplicateKey"
 
-	DatabaseErr ErrCode = "Error.Repository.Database"
-	NotFoundErr ErrCode = "Error.Repository.NotFound"
+	ErrRPCTimeout ErrCode = "Error.RPC.Timeout"
 )
 
 type ErrData map[string]interface{}
 
 // Error represent an errors happened in the application
 type Error struct {
-	Code    ErrCode
+	Code ErrCode
+	Data ErrData
+
+	Err     error
 	Message string
-	Trace   string
-
-	ErrData
-
-	stackErrData []ErrData
-	err          error
 }
 
 func NewError(code ErrCode, err error, data ErrData) *Error {
@@ -39,7 +37,9 @@ func NewError(code ErrCode, err error, data ErrData) *Error {
 	appErr, ok := err.(*Error)
 	if ok {
 		if data != nil {
-			appErr.stackErrData = append(appErr.stackErrData, data)
+			for k, v := range data {
+				appErr.Data[k] = v
+			}
 		}
 		return appErr
 	}
@@ -47,14 +47,36 @@ func NewError(code ErrCode, err error, data ErrData) *Error {
 	return &Error{
 		Code:    code,
 		Message: err.Error(),
-		ErrData: data,
-		Trace:   trace(),
+		Data:    data,
 	}
 }
 
+func (e *Error) Unwrap() error {
+	return e.Err
+}
+
+func (e *Error) UnderlyingErr() error {
+	return e.Err
+}
+
 // Error used to implement errors interface
-func (e Error) Error() string {
+func (e *Error) Error() string {
 	return e.Message
+}
+
+func NewErrorFromDomain(err error) *Error {
+	if err == nil {
+		return nil
+	}
+
+	switch {
+	default:
+		return &Error{
+			Code:    ErrUndefined,
+			Message: "undefined error",
+			Err:     err,
+		}
+	}
 }
 
 // trace used to return the line of the code that creates the errors

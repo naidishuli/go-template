@@ -11,7 +11,7 @@ func Unauthorized(err error, details map[string]interface{}) *Error {
 				"reason": details["reason"],
 			},
 		},
-		err: app.NewError(app.UndefinedErr, err, details),
+		err: app.NewError(app.ErrUndefined, err, details),
 	}
 }
 
@@ -22,7 +22,7 @@ func BadRequest(err error, details interface{}) *Error {
 			Message: "Bad request",
 			Details: details,
 		},
-		err: app.NewError(app.UndefinedErr, err, nil),
+		err: app.NewError(app.ErrUndefined, err, nil),
 	}
 }
 
@@ -35,7 +35,7 @@ func BadRequestMalformed(err error) *Error {
 				"error": "malformed request",
 			},
 		},
-		err: app.NewError(app.UndefinedErr, err, nil),
+		err: app.NewError(app.ErrUndefined, err, nil),
 	}
 }
 
@@ -45,7 +45,7 @@ func InternalServerError(err error) *Error {
 		Response: Response{
 			Message: "Internal server error",
 		},
-		err: app.NewError(app.UndefinedErr, err, nil),
+		err: app.NewError(app.ErrUndefined, err, nil),
 	}
 }
 

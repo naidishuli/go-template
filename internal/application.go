@@ -2,6 +2,8 @@ package internal
 
 import (
 	"go-template/internal/app"
+	"go-template/internal/repository"
+	"go-template/internal/service"
 	"go-template/pkg/logger"
 	"gorm.io/gorm"
 )
@@ -19,25 +21,21 @@ type Application struct {
 	logger         app.Logger
 }
 
-func NewApplication() (*Application, error) {
+func NewApplication() *Application {
 	appl := Application{
 		logger: logger.NewLogger(nil, nil),
 	}
 
+	appl.db = new(gorm.DB)
 	appl.pkgPool = new(app.Pkg)
-	appl.repositoryPool = new(app.Repository)
-	appl.servicePool = new(app.Service)
-
-	pkgPool, err := initializePkg(&appl)
-	if err != nil {
-		return nil, err
+	appl.repositoryPool = &app.Repository{
+		Temp: new(repository.Temp),
 	}
-	*appl.pkgPool = pkgPool
+	appl.servicePool = &app.Service{
+		Temp: new(service.Temp),
+	}
 
-	*appl.repositoryPool = initializeRepository(&appl)
-	*appl.servicePool = initializeService(&appl)
-
-	return &appl, nil
+	return &appl
 }
 
 func (a Application) DB() *gorm.DB {

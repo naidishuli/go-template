@@ -3,24 +3,19 @@ package api
 import (
 	"github.com/gofiber/fiber/v2"
 	"go-template/api/common"
-	"go-template/api/middlewares"
+	"go-template/api/controller"
+	"go-template/api/middleware"
 	"go-template/internal/app"
-
-	"go-template/api/controllers/temp"
 )
 
 // RegisterRoutes used to register api routes to their handlers.
 func RegisterRoutes(app app.App, fiberApp *fiber.App) {
-	ctxController := common.NewContext(app)
-	generalMiddlewares := middlewares.NewCommon(app)
+	cmnController := common.NewController(app)
+	cmnMiddleware := middleware.NewCommon(app)
 
-	// initialize all controllers here
-	tempController := temp.NewController(ctxController)
+	privateRoutes := fiberApp.Group("/api", cmnMiddleware.Authorize)
 
-	// register all the secure routes here
-	securedAPI := fiberApp.Group("/api", generalMiddlewares.Authorize)
-
-	tempController.RegisterRoutes(securedAPI, fiberApp)
+	controller.NewTemp(cmnController).RegisterRoutes(privateRoutes, fiberApp)
 
 	pingRoute(fiberApp)
 }
