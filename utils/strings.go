@@ -42,11 +42,3 @@ func FetchString(value, def string) string {
 
 	return def
 }
-
-func StringPtrValue(s *string) string {
-	if s == nil {
-		return ""
-	}
-
-	return *s
-}

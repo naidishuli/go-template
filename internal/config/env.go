@@ -24,9 +24,9 @@ type EnvVariables struct {
 	GolangEnv                  string
 	Port                       int
 	DatabaseUrl                string
-	DatabaseHostname           string
+	DatabaseHost               string
 	DatabasePort               int
-	DatabaseDbName             string
+	DatabaseName               string
 	DatabaseUsername           string
 	DatabasePassword           string
 	DatabaseSslMode            string

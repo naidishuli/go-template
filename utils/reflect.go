@@ -11,7 +11,7 @@ func TypeName(typ interface{}) string {
 	case string:
 		return v
 	case *string:
-		return StringPtrValue(v)
+		return ValueOf(v)
 	}
 
 	v := reflect.ValueOf(typ)

@@ -77,6 +77,5 @@ func CaptureStdOutput(f func()) string {
 
 	wg.Wait()
 	f()
-	writer.Close()
 	return <-out
 }

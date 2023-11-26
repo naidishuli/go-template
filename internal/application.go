@@ -2,13 +2,14 @@ package internal
 
 import (
 	"go-template/internal/app"
-	"go-template/internal/config"
-	tempRepo "go-template/internal/repository"
-	"go-template/internal/services/temp"
-	"go-template/pkg/jwt"
 	"go-template/pkg/logger"
 	"gorm.io/gorm"
 )
+
+type ApplicationConfig struct {
+	NoDB     bool
+	NoRabbit bool
+}
 
 type Application struct {
 	db             *gorm.DB
@@ -57,22 +58,4 @@ func (a Application) Service() *app.Service {
 
 func (a Application) Log() app.Logger {
 	return a.logger
-}
-
-func initializeRepository(appl *Application) app.Repository {
-	return app.Repository{
-		Temp: tempRepo.NewTemp(appl),
-	}
-}
-
-func initializeService(appl *Application) app.Service {
-	return app.Service{
-		Temp: temp.NewService(appl),
-	}
-}
-
-func initializePkg(appl *Application) (app.Pkg, error) {
-	return app.Pkg{
-		JWT: jwt.New(config.Env.JwtVerificationKey),
-	}, nil
 }
