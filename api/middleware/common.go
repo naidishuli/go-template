@@ -4,11 +4,11 @@ import (
 	"context"
 	"go-template/internal/app"
 	"go-template/internal/config"
+	"go-template/internal/domain/model"
 
 	"github.com/gofiber/fiber/v2"
 
 	"go-template/api/apierror"
-	"go-template/internal/model"
 )
 
 //go:generate mockgen -source common.go -package mocks -destination mocks/common_mock.go
