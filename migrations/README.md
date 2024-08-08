@@ -1,1 +1,1 @@
-go run cmd/migrate/migrate.go create test_new_table sql
+go run cmd/migrate/migrate.go create create_locations sql

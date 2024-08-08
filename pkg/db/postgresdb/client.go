@@ -1,74 +1,104 @@
 package postgresdb
 
 import (
-	"fmt"
-	_ "github.com/lib/pq"
-	"go-template/internal/config"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
-	"os"
+    "fmt"
+    "log"
+    "os"
+    "time"
+
+    _ "github.com/lib/pq"
+    "gorm.io/driver/postgres"
+    "gorm.io/gorm"
+    "gorm.io/gorm/logger"
 )
 
 func New(config Config) (*gorm.DB, error) {
-	config.parse()
+    config.parse()
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s",
-		config.Host,
-		config.Port,
-		config.Username,
-		config.Password,
-		config.Database,
-	)
+    psqlInfo := fmt.Sprintf("host=%s dbname=%s",
+        config.Host,
+        config.Database,
+    )
 
-	if config.SSLMode != "" {
-		psqlInfo += fmt.Sprintf(" sslmode=%s", config.SSLMode)
-	}
+    if config.Port > 0 {
+        psqlInfo += fmt.Sprintf(" port=%d", config.Port)
+    }
 
-	logMode := logger.Default.LogMode(logger.Info)
-	if os.Getenv("GOLANG_ENV") == "production" {
-		logMode = logger.Default.LogMode(logger.Silent)
-	}
+    if config.Username != "" {
+        psqlInfo += fmt.Sprintf(" user=%s", config.Username)
+    }
 
-	if os.Getenv("GOLANG_ENV") == "test" {
-		logMode = logger.Default.LogMode(logger.Warn)
-	}
+    if config.Password != "" {
+        psqlInfo += fmt.Sprintf(" password=%s", config.Password)
+    }
 
-	db, err := gorm.Open(postgres.Open(psqlInfo), &gorm.Config{
-		Logger:                 logMode,
-		FullSaveAssociations:   false,
-		SkipDefaultTransaction: true,
-	})
-	if err != nil {
-		return nil, err
-	}
+    if config.SSLMode == "" {
+        config.SSLMode = "disable"
 
-	dbRef, err := db.DB()
-	if err != nil {
-		return nil, err
-	}
+    }
 
-	if err = dbRef.Ping(); err != nil {
-		return nil, err
-	}
+    logConfig := logger.Config{
+        SlowThreshold:             time.Second, // Slow SQL threshold
+        LogLevel:                  logger.Info, // Log level
+        IgnoreRecordNotFoundError: false,       // Ignore ErrRecordNotFound error for logger
+        ParameterizedQueries:      false,       // Don't include params in the SQL log
+        Colorful:                  true,        // Disable color
+    }
 
-	dbRef.SetMaxIdleConns(config.MaxIdleConnections)
-	dbRef.SetMaxOpenConns(config.MaxOpenConnections)
+    if os.Getenv("GOLANG_ENV") == "production" {
+        logConfig.LogLevel = logger.Silent
+        logConfig.ParameterizedQueries = true
+    }
 
-	if config.SaveSQLAfterExecution {
-		db.Callback().Query().Register("*", dbStatementCallback)
-		db.Callback().Create().Register("*", dbStatementCallback)
-		db.Callback().Update().Register("*", dbStatementCallback)
-		db.Callback().Delete().Register("*", dbStatementCallback)
-		db.Callback().Row().Register("*", dbStatementCallback)
-		db.Callback().Raw().Register("*", dbStatementCallback)
-	}
+    if os.Getenv("GOLANG_ENV") == "test" {
+        logConfig.LogLevel = logger.Warn
+        logConfig.ParameterizedQueries = true
+    }
 
-	return db, nil
+    logMode := logger.New(
+        log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+        logConfig,
+    )
+
+    db, err := gorm.Open(postgres.Open(psqlInfo), &gorm.Config{
+        Logger:                 logMode,
+        FullSaveAssociations:   false,
+        SkipDefaultTransaction: true,
+    })
+    if err != nil {
+        return nil, err
+    }
+
+    dbRef, err := db.DB()
+    if err != nil {
+        return nil, err
+    }
+
+    if err = dbRef.Ping(); err != nil {
+        return nil, err
+    }
+
+    dbRef.SetMaxIdleConns(config.MaxIdleConnections)
+    dbRef.SetMaxOpenConns(config.MaxOpenConnections)
+
+    callbackFnc := dbStatementCallback(config)
+
+    if config.SaveSQLAfterExecution {
+        db.Callback().Query().Register("*", callbackFnc)
+        db.Callback().Create().Register("*", callbackFnc)
+        db.Callback().Update().Register("*", callbackFnc)
+        db.Callback().Delete().Register("*", callbackFnc)
+        db.Callback().Row().Register("*", callbackFnc)
+        db.Callback().Raw().Register("*", callbackFnc)
+    }
+
+    return db, nil
 }
 
-func dbStatementCallback(db *gorm.DB) {
-	stmt := db.Statement
-	sqlQuery := db.Dialector.Explain(stmt.SQL.String(), stmt.Vars...)
-	db.Set(config.GormSQLKey, sqlQuery)
+func dbStatementCallback(config Config) func(db *gorm.DB) {
+    return func(db *gorm.DB) {
+        stmt := db.Statement
+        sqlQuery := db.Dialector.Explain(stmt.SQL.String(), stmt.Vars...)
+        db.Set(config.CallbackSqlKey, sqlQuery)
+    }
 }

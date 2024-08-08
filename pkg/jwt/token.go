@@ -1,11 +1,7 @@
 package jwt
 
 import (
-	"encoding/json"
-	"strings"
-	"time"
-
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type Token struct {
@@ -21,45 +17,25 @@ func New(secret string) *JWT {
 	return &JWT{secret}
 }
 
-// VerifyDataToken validate the authentication header and fills the data variable with the information found.
-func (j *JWT) VerifyDataToken(header string, data interface{}) error {
-	bearerToken := strings.Split(header, " ")
-	if len(bearerToken) != 2 {
-		return malformedError()
-	}
-
-	token, err := jwt.Parse(bearerToken[1], func(token *jwt.Token) (interface{}, error) {
+func (j JWT) ParseToken(tokenValue string, claim jwt.Claims) error {
+	token, err := jwt.ParseWithClaims(tokenValue, claim, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, verificationError()
+			return nil, ErrVerification
 		}
 		return []byte(j.secret), nil
 	})
-
 	if err != nil {
 		return err
 	}
 
 	if !token.Valid {
-		return invalidError()
+		return ErrTokenInvalid
 	}
 
-	return json.Unmarshal([]byte(token.Claims.(jwt.MapClaims)["user"].(string)), data)
+	return nil
 }
 
-// GenerateUserToken generate a jwt token string using an HS256 signing method from the given secret.
-func (j *JWT) GenerateUserToken(userData string) (token Token, err error) {
-	expiresAt := time.Now().Add(time.Hour * 30 * 24).Unix()
-	claimMap := jwt.MapClaims{
-		"user": userData,
-		"exp":  expiresAt,
-	}
-
-	tokenValue := jwt.NewWithClaims(jwt.SigningMethodHS256, claimMap)
-
-	tokenString, err := tokenValue.SignedString([]byte(j.secret))
-	if err != nil {
-		return token, signError(err)
-	}
-
-	return Token{Token: tokenString, ExpiresAt: expiresAt}, nil
+func (j JWT) GenerateToken(claim jwt.Claims) (string, error) {
+	tokenValue := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+	return tokenValue.SignedString([]byte(j.secret))
 }

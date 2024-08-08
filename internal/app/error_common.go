@@ -1,46 +1,52 @@
 package app
 
 import (
-	"errors"
-	"fmt"
-	"go-template/internal/config"
-	"go-template/utils"
-	"gorm.io/gorm"
-	"strings"
+    "errors"
+    "fmt"
+    "strings"
+
+    "bets/utils"
+    "gorm.io/gorm"
 )
 
-func GormErr(tx *gorm.DB, data ErrData) error {
-	if tx.Error == nil {
-		return nil
-	}
+func GormErr(tx *gorm.DB, errs ...error) error {
+    var dbError error
 
-	var err *Error
-	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
-		err = NotFoundError(tx.Statement.Model, data)
-	} else if errors.Is(tx.Error, gorm.ErrDuplicatedKey) {
-		err = &Error{Code: ErrDuplicateKey, Err: tx.Error, Data: data}
-	} else {
-		err = &Error{Code: ErrDatabase, Err: tx.Error, Data: data}
-	}
+    if tx != nil && tx.Error != nil {
+        dbError = tx.Error
+    } else if len(errs) > 0 {
+        dbError = errs[0]
+    } else {
+        return nil
+    }
 
-	val, _ := tx.Get(config.GormSQLKey)
-	str, ok := val.(string)
-	if ok {
-		if err.Data == nil {
-			err.Data = make(map[string]interface{})
-			err.Data[config.GormSQLKey] = str
-		}
-	}
+    var err error
+    if errors.Is(dbError, gorm.ErrRecordNotFound) {
+        err = DBNotFoundErr(tx.Statement.Model)
+    } else if errors.Is(dbError, gorm.ErrDuplicatedKey) {
+        err = &Error{Code: "database.duplicated_key", Err: dbError}
+    } else {
+        err = &Error{Code: "database.undefined", Err: dbError}
+    }
 
-	return err
+    // this is to get extra key from the db context
+    // val, _ := tx.Get(config.GormSQLKey)
+    // str, ok := val.(string)
+    // if ok {
+    // 	if err.Data == nil {
+    // 		err.Data = make(map[string]interface{})
+    // 		err.Data[config.GormSQLKey] = str
+    // 	}
+    // }
+
+    return err
 }
 
-func NotFoundError(typ interface{}, data ErrData) *Error {
-	resourceType := fmt.Sprintf("%s", strings.ToLower(utils.TypeName(typ)))
+func DBNotFoundErr(typ interface{}) error {
+    resourceType := fmt.Sprintf("%s", strings.ToLower(utils.TypeName(typ)))
 
-	return &Error{
-		Code:    ErrNotFound,
-		Message: fmt.Sprintf("%s not found", resourceType),
-		Data:    data,
-	}
+    return &Error{
+        Code:    "database.not_found",
+        Message: fmt.Sprintf("%s not found", resourceType),
+    }
 }

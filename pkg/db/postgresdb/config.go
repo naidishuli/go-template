@@ -1,11 +1,12 @@
 package postgresdb
 
 import (
+	"net/url"
 	"regexp"
 	"strconv"
 )
 
-var dbUrlRegex = regexp.MustCompile("//(.+):(.+)@(.+):(.+)/(.+)")
+var dbUrlRegex = regexp.MustCompile(`//(.+)?:(.+)?@(.+)?:(.\d+)?(\/(.*))?`)
 
 type Config struct {
 	Url                   string
@@ -18,6 +19,7 @@ type Config struct {
 	MaxIdleConnections    int
 	MaxOpenConnections    int
 	SaveSQLAfterExecution bool
+	CallbackSqlKey        string
 }
 
 func (c *Config) parse() {
@@ -29,12 +31,25 @@ func (c *Config) parse() {
 		c.MaxIdleConnections = 50
 	}
 
+	// get and remove extra query params passed to the connection string
 	if c.Url != "" {
-		parts := dbUrlRegex.FindStringSubmatch(c.Url)
+		u, _ := url.Parse(c.Url)
+
+		for key, values := range u.Query() {
+			for _, value := range values {
+				if key == "sslmode" && value != "" {
+					c.SSLMode = value
+				}
+			}
+		}
+
+		u.RawQuery = ""
+
+		parts := dbUrlRegex.FindStringSubmatch(u.String())
 		c.Username = parts[1]
 		c.Password = parts[2]
 		c.Host = parts[3]
 		c.Port, _ = strconv.Atoi(parts[4])
-		c.Database = parts[5]
+		c.Database = parts[6]
 	}
 }

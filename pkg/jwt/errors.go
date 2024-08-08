@@ -1,49 +1,14 @@
 package jwt
 
-import "fmt"
+import (
+	"errors"
+)
 
 type ErrorReason string
 
-const (
-	MalformedErr    ErrorReason = "Malformed token"
-	VerificationErr ErrorReason = "Error verification method"
-	InvalidErr      ErrorReason = "Invalid token"
-	SignTokenErr    ErrorReason = "Error signing token"
+var (
+	ErrTokenMalformed = errors.New("token is malformed")
+	ErrTokenInvalid   = errors.New("token is invalid")
+	ErrTokenSign      = errors.New("token sign is not correct")
+	ErrVerification   = errors.New("verification error")
 )
-
-type tokenError struct {
-	reason  ErrorReason
-	message string
-}
-
-func (e tokenError) Error() string {
-	return fmt.Sprintf("%s | %s", e.reason, e.message)
-}
-
-func malformedError() *tokenError {
-	return &tokenError{
-		reason:  MalformedErr,
-		message: "bearer token malformed or not present",
-	}
-}
-
-func verificationError() *tokenError {
-	return &tokenError{
-		reason:  VerificationErr,
-		message: "errors verification jwtoken method",
-	}
-}
-
-func invalidError() *tokenError {
-	return &tokenError{
-		reason:  InvalidErr,
-		message: "invalid token",
-	}
-}
-
-func signError(err error) *tokenError {
-	return &tokenError{
-		reason:  SignTokenErr,
-		message: fmt.Sprintf("cannot sign token string: %s", err),
-	}
-}

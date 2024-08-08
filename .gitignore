@@ -8,3 +8,8 @@
 # API DOC files
 docs/*
 !docs/.keep
+
+/public/uploads/*
+!/public/uploads/.keep
+
+.DS_Store

@@ -1,0 +1,9 @@
+configs:
+#  - cronspec: "*/1 * * * *"
+#    task_type: ingest_job_feed
+#    queue: ingest_job_feed:queue
+#    retry: 3
+#    timeout_hours_ttl: 10
+#    unique_hours_ttl: 24
+#    args:
+#      feed: appcast-cpc

@@ -1,80 +1,79 @@
 package utils
 
 import (
-	"math/rand"
-	"reflect"
-	"time"
+    "fmt"
+    "reflect"
+    "strings"
 )
 
-func PtrTo[value any](v value) *value {
-	return &v
+type BasicValue interface {
+    int | string
 }
 
-func ValueOf[T any](value *T) T {
-	if value == nil {
-		return reflect.Zero(getType(value)).Interface().(T)
-	}
+func PtrTo[value any](v value) *value {
+    return &v
+}
 
-	return *value
+func ValueOf[T comparable](value *T) T {
+    if value == nil {
+        return reflect.Zero(getType(value)).Interface().(T)
+    }
+
+    return *value
 }
 
 func getType(a any) reflect.Type {
-	v := reflect.ValueOf(a)
-	if v.Kind() == reflect.Ptr {
-		return v.Type().Elem()
-	}
+    v := reflect.ValueOf(a)
+    if v.Kind() == reflect.Ptr {
+        return v.Type().Elem()
+    }
 
-	return v.Type()
+    return v.Type()
 }
 
 func SliceOfAny[T any](values []T) []any {
-	a := make([]any, 0, len(values))
-	for _, v := range values {
-		a = append(a, v)
-	}
+    a := make([]any, 0, len(values))
+    for _, v := range values {
+        a = append(a, v)
+    }
 
-	return a
+    return a
 }
 
-func Uniq[T comparable](values []T) []T {
-	if values == nil {
-		return nil
-	}
+func Join[T any](elems []T, sep string) string {
+    n := len(elems)
 
-	l := len(values)
-	u := make(map[T]bool, l)
-	r := make([]T, 0, l)
-	for _, val := range values {
-		if _, ok := u[val]; !ok {
-			u[val] = true
-			r = append(r, val)
-		}
-	}
+    switch n {
+    case 0:
+        return ""
+    case 1:
+        return fmt.Sprintf("%v", elems[0])
+    }
 
-	return r
+    var b strings.Builder
+    b.Grow(n)
+    b.WriteString(fmt.Sprintf("%v", elems[0]))
+    for _, s := range elems[1:] {
+        b.WriteString(sep)
+        b.WriteString(fmt.Sprintf("%v", s))
+    }
+    return b.String()
 }
 
-func MapKeys[K comparable, V any](values map[K]V) []K {
-	if values == nil {
-		return nil
-	}
+func Ternary[T any](condition bool, a, b T) T {
+    if condition {
+        return a
+    }
 
-	keys := make([]K, 0, len(values))
-	for key, _ := range values {
-		keys = append(keys, key)
-	}
-
-	return keys
+    return b
 }
 
-func RandomPick[T any](values []T) T {
-	valuesLen := len(values)
-	if valuesLen == 0 {
-		var tmp T
-		return tmp
-	}
+func ArrayIncludes[T comparable](arr []T, value T) bool {
+    for _, v := range arr {
+        if v == value {
+            return true
+        }
+    }
 
-	rand.Seed(time.Now().UnixNano())
-	index := rand.Intn(valuesLen)
-	return values[index]
+    return false
 }

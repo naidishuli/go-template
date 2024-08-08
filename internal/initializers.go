@@ -1,71 +1,95 @@
 package internal
 
 import (
-	"go-template/internal/app"
-	"go-template/internal/config"
-	"go-template/internal/service"
-	"go-template/pkg/db/postgresdb"
-	"gorm.io/gorm"
+    "bets/config"
+    "bets/internal/app"
+    "bets/internal/repository"
+    "bets/pkg/db/postgresdb"
+    "bets/pkg/jwt"
+    "bets/pkg/stub"
+    "github.com/hibiken/asynq"
+    "github.com/redis/go-redis/v9"
+    "gorm.io/gorm"
 )
 
-func InitializeApp(appl *Application, cfg ApplicationConfig) error {
-	if !cfg.NoDB {
-		db, err := initializeDB()
-		if err != nil {
-			return err
-		}
-		*appl.db = *db
-	}
+func Startbetstion(appl *Application) error {
+    if !appl.config.NoDB {
+        db, err := InitializeDB()
+        if err != nil {
+            return err
+        }
+        *appl.db = *db
+    } else {
+        stubDb, err := stub.NewGorm()
+        if err != nil {
+            return err
+        }
+        *appl.db = *stubDb
+    }
 
-	pkgPool, err := initializePkg(appl, cfg)
-	if err != nil {
-		return err
-	}
+    ipkg, err := initializePkg(appl)
+    if err != nil {
+        return err
+    }
+    *appl.pkg = ipkg
 
-	*appl.pkgPool = pkgPool
-	initializeRepository(appl)
-	initializeService(appl)
-	initializeTask(appl)
+    initializeRepository(appl)
+    initializeService(appl)
+    initializeTask(appl)
 
-	return nil
+    return nil
+}
+
+func initializePkg(appl *Application) (app.Pkg, error) {
+    // asynq task manager
+    redisOpts, err := redis.ParseURL(config.Env.Fetch("REDIS_URL"))
+    if err != nil {
+        return app.Pkg{}, err
+    }
+
+    // redis client
+    redisClient := redis.NewClient(redisOpts)
+
+    var asynqClient app.AsynqClient = &stub.AsynqStub{}
+    if !appl.config.NoRedis {
+        asynqClient = asynq.NewClient(&asynq.RedisClientOpt{
+            Network:      redisOpts.Network,
+            Addr:         redisOpts.Addr,
+            Username:     redisOpts.Username,
+            Password:     redisOpts.Password,
+            DB:           redisOpts.DB,
+            DialTimeout:  redisOpts.DialTimeout,
+            ReadTimeout:  redisOpts.ReadTimeout,
+            WriteTimeout: redisOpts.WriteTimeout,
+            PoolSize:     redisOpts.PoolSize,
+            TLSConfig:    redisOpts.TLSConfig,
+        })
+    }
+
+    return app.Pkg{
+        AsynqClient: asynqClient,
+        JWT:         jwt.New(config.Env.Fetch("JWT_SECRET_KEY")),
+        RedisClient: redisClient,
+    }, nil
 }
 
 func initializeRepository(appl *Application) {
-	// *appl.repositoryPool.Base.(*repository.Base) = *repository.NewBase(appl)
+    *appl.repository.Base.(*repository.Base) = *repository.NewBase(appl)
 }
 
 func initializeService(appl *Application) {
-	*appl.servicePool.Temp.(*service.Temp) = *service.NewTemp(appl)
+    //*appl.service.Auth.(*service.Auth) = *service.NewAuth(appl)
 }
 
 func initializeTask(appl *Application) {
-
+    //*appl.task.SendEmail.(*task.SendEmail) = *task.NewSendEmail(appl)
 }
 
-// todo add more context on errors here
-func initializePkg(appl *Application, cfg ApplicationConfig) (app.Pkg, error) {
-	// asynqClient := asynqwrp.NewClient(
-	// 	asynq.RedisClientOpt{Addr: config.Env.RedisURL},
-	// 	config.Env.SkipAsynq,
-	// )
+func InitializeDB() (*gorm.DB, error) {
+    db, err := postgresdb.New(postgresdb.Config{
+        Url:                   config.Env.Fetch("DATABASE_URL"),
+        SaveSQLAfterExecution: true,
+    })
 
-	if config.Env.GolangEnv == "production" {
-		// todo use something else on the cloud
-	}
-
-	return app.Pkg{}, nil
-}
-
-func initializeDB() (*gorm.DB, error) {
-	db, err := postgresdb.New(postgresdb.Config{
-		Host:                  config.Env.DatabaseHost,
-		Port:                  config.Env.DatabasePort,
-		Username:              config.Env.DatabaseUsername,
-		Password:              config.Env.DatabasePassword,
-		Database:              config.Env.DatabaseName,
-		SSLMode:               config.Env.DatabaseSslMode,
-		SaveSQLAfterExecution: true,
-	})
-
-	return db, err
+    return db, err
 }
