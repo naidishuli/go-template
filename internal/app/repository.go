@@ -1,7 +1,7 @@
 package app
 
 import (
-    "bets/pkg/rest"
+    "go-template/pkg/rest"
     "gorm.io/gorm"
     "gorm.io/gorm/clause"
 )

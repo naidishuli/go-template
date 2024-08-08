@@ -1,18 +1,18 @@
 package internal
 
 import (
-    "bets/config"
-    "bets/internal/app"
-    "bets/internal/repository"
-    "bets/pkg/db/postgresdb"
-    "bets/pkg/jwt"
-    "bets/pkg/stub"
     "github.com/hibiken/asynq"
     "github.com/redis/go-redis/v9"
+    "go-template/config"
+    "go-template/internal/app"
+    "go-template/internal/repository"
+    "go-template/pkg/db/postgresdb"
+    "go-template/pkg/jwt"
+    "go-template/pkg/stub"
     "gorm.io/gorm"
 )
 
-func Startbetstion(appl *Application) error {
+func StartApplication(appl *Application) error {
     if !appl.config.NoDB {
         db, err := InitializeDB()
         if err != nil {

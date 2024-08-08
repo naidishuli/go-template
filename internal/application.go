@@ -1,9 +1,9 @@
 package internal
 
 import (
-    "bets/internal/app"
-    "bets/internal/repository"
-    "bets/pkg/logger"
+    "go-template/internal/app"
+    "go-template/internal/repository"
+    "go-template/pkg/logger"
     "gorm.io/gorm"
 )
 
@@ -25,7 +25,7 @@ type Application struct {
     cases      *Cases
 }
 
-func Newbetstion(config ApplicationConfig) *Application {
+func NewApplication(config ApplicationConfig) *Application {
     appl := Application{
         log:    logger.NewLogger(nil, nil),
         config: config,

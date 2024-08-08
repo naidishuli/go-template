@@ -7,7 +7,7 @@ import (
     "strings"
     "time"
 
-    "bets/utils"
+    "go-template/utils"
     "gorm.io/gorm"
     "gorm.io/gorm/clause"
 )

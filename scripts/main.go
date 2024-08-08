@@ -4,7 +4,7 @@ import (
     "fmt"
     "os"
 
-    "bets/scripts/command"
+    "go-template/scripts/command"
     "github.com/spf13/cobra"
 )
 

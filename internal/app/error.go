@@ -5,7 +5,7 @@ import (
     "fmt"
 )
 
-// Error represent an errors happened in the betstion
+// Error represent an errors happened in the go-templatetion
 type Error struct {
     Code    string
     Message string

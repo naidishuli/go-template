@@ -4,11 +4,11 @@ import (
     "fmt"
     "time"
 
-    "bets/config"
-    "bets/internal"
-    "bets/internal/api"
     "github.com/gofiber/fiber/v3/middleware/static"
     "github.com/spf13/cobra"
+    "go-template/config"
+    "go-template/internal"
+    "go-template/internal/api"
 )
 
 var RunServerCmd = &cobra.Command{
@@ -21,8 +21,8 @@ func runServer(c *cobra.Command, args []string) {
     location, err := time.LoadLocation("UTC")
     time.Local = location
 
-    app := internal.Newbetstion(internal.ApplicationConfig{})
-    err = internal.Startbetstion(app)
+    app := internal.NewApplication(internal.ApplicationConfig{})
+    err = internal.StartApplication(app)
     if err != nil {
         panic(err)
     }

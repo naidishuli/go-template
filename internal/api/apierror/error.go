@@ -6,8 +6,8 @@ import (
     "fmt"
     "strings"
 
-    "bets/config"
-    "bets/internal/app"
+    "go-template/config"
+    "go-template/internal/app"
     "gopkg.in/yaml.v3"
 )
 

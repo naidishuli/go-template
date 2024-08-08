@@ -3,10 +3,10 @@ package common
 import (
     "net/http"
 
-    "bets/internal/api/apierror"
-    "bets/internal/app"
-    "bets/pkg/validator"
     "github.com/gofiber/fiber/v3"
+    "go-template/internal/api/apierror"
+    "go-template/internal/app"
+    "go-template/pkg/validator"
 )
 
 type Validatable interface {

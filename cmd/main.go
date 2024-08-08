@@ -4,13 +4,13 @@ import (
     "fmt"
     "os"
 
-    "bets/cmd/command"
+    "go-template/cmd/command"
     "github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
     Use:   "cmd",
-    Short: "betstion entry points, executables and more",
+    Short: "go-templatetion entry points, executables and more",
 }
 
 func init() {

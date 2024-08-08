@@ -4,7 +4,7 @@ import (
     "context"
     "log"
 
-    "bets/config"
+    "go-template/config"
     "gorm.io/gorm"
 )
 

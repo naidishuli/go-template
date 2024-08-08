@@ -3,7 +3,7 @@ package rest
 import (
     "strings"
 
-    "bets/utils"
+    "go-template/utils"
 )
 
 type OrderType string

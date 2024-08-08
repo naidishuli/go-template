@@ -3,7 +3,7 @@ package common
 import (
     "net/url"
 
-    "bets/internal/app"
+    "go-template/internal/app"
     "github.com/gofiber/fiber/v3"
 )
 

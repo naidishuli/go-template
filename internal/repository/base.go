@@ -3,8 +3,8 @@ package repository
 import (
     "fmt"
 
-    "bets/internal/app"
-    "bets/pkg/rest"
+    "go-template/internal/app"
+    "go-template/pkg/rest"
     "gorm.io/gorm"
     "gorm.io/gorm/clause"
 )

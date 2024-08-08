@@ -4,7 +4,7 @@ import (
     "encoding/json"
     "reflect"
 
-    "bets/utils"
+    "go-template/utils"
     "gorm.io/gorm"
 )
 

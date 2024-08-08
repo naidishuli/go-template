@@ -5,7 +5,7 @@ import (
     "fmt"
     "strings"
 
-    "bets/utils"
+    "go-template/utils"
     "gorm.io/gorm"
 )
 

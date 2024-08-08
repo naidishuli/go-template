@@ -4,9 +4,9 @@ import (
     "net/http"
     "time"
 
-    "bets/config"
-    "bets/internal/api/apierror"
-    "bets/internal/app"
+    "go-template/config"
+    "go-template/internal/api/apierror"
+    "go-template/internal/app"
     "github.com/gofiber/fiber/v3"
     "github.com/gofiber/fiber/v3/middleware/cors"
     "github.com/gofiber/fiber/v3/middleware/logger"

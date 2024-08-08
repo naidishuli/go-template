@@ -5,8 +5,8 @@ import (
     "flag"
     "log"
 
-    "bets/internal"
-    _ "bets/migrations"
+    "go-template/internal"
+    _ "go-template/migrations"
     "github.com/pressly/goose/v3"
     "github.com/spf13/cobra"
 )

@@ -4,7 +4,7 @@ import (
     "os"
     "path"
 
-    "bets/utils"
+    "go-template/utils"
     "github.com/joho/godotenv"
 )
 

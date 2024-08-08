@@ -6,7 +6,7 @@ import (
     "os"
     "time"
 
-    "bets/utils"
+    "go-template/utils"
 )
 
 //go:embed *

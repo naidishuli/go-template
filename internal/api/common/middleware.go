@@ -3,9 +3,9 @@ package common
 import (
     "strings"
 
-    "bets/internal/api/apierror"
-    "bets/internal/app"
     "github.com/gofiber/fiber/v3"
+    "go-template/internal/api/apierror"
+    "go-template/internal/app"
 )
 
 type Middleware struct {

@@ -3,7 +3,7 @@ package task
 import (
     "encoding/json"
 
-    "bets/internal/app"
+    "go-template/internal/app"
     "github.com/hibiken/asynq"
 )
 
